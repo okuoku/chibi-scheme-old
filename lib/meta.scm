@@ -28,6 +28,10 @@
   (string-concatenate
    (reverse (cons ".sld" (cdr (module-name->strings name '()))))))
 
+(define (module-name->file/r7b name)
+  (string-concatenate
+   (reverse (cons ".sls" (cdr (module-name->strings name '()))))))
+
 (define (module-name-prefix name)
   (string-concatenate (reverse (cdr (cdr (module-name->strings name '()))))))
 
@@ -35,7 +39,8 @@
   (let ((meta-env (current-environment)))
     (lambda (name)
       (let* ((file (module-name->file name))
-             (path (find-module-file file)))
+             (path (or (find-module-file file)
+                       (find-module-file (module-name->file/r7b name)))))
         (if path (load path meta-env))))))
 
 (define (find-module name)
@@ -182,6 +187,7 @@
 
 (define-syntax define-library define-library-transformer)
 (define-syntax module define-library-transformer)
+(define-syntax library define-library-transformer)
 
 (define-syntax define-config-primitive
   (er-macro-transformer
